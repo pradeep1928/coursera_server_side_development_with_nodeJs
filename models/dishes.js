@@ -7,17 +7,17 @@ var currency = mongoose.Types.Currency;
 
 // Defining Schema 
 var commentSchema = new Schema({
-    rating:  {
+    rating: {
         type: Number,
         min: 1,
         max: 5,
         required: true
     },
-    comment:  {
+    comment: {
         type: String,
         required: true
     },
-    author:  {
+    author: {
         type: String,
         required: true
     }
@@ -56,12 +56,11 @@ var dishSchema = new Schema({
         type: Boolean,
         required: true
     },
-
-
-    comments:[commentSchema]
-}, {
-    timestamps: true
-});
+    comments: [commentSchema]
+},
+    { usePushEach: true },
+    { timestamps: true }
+);
 
 var Dishes = mongoose.model('Dish', dishSchema);
 
