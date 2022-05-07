@@ -1,55 +1,89 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
+
+const Leaders = require("../models/leaders")
 
 const leaderRouter = express.Router();
-
 leaderRouter.use(bodyParser.json());
 
 
 // Routes and endpoints 
 leaderRouter.route('/')
-    .all((req, res, next) => {          // all route will apply to all type of routes 
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain');
-        next();
-    })
     .get((req, res, next) => {          // get route 
-        res.end("Will send all leaders to you");
+        Leaders.find({})
+            .then((leaders) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(leaders);
+            }, (err) => next(err))
+            .catch((error) => next(error));
     })
+
     .post((req, res, next) => {         // post route 
-        res.end("Will add the leaders: " + req.body.name + " with details: " + req.body.description);
+        Leaders.create(req.body)
+            .then((leader) => {
+                console.log("leader created", leader);
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(leader);
+            }, (err) => next(err))
+            .catch((error) => next(error));
     })
+
     .put((req, res, next) => {          // put route
         res.statusCode = 403;
-        res.end("Put operation not supported on /leaders endpoint");
+        res.end("Put operation not supported on /promotions endpoint");
     })
+
     .delete((req, res, next) => {       // delete route 
-        res.end("Deleting all the leaders");
+        Leaders.remove({})
+            .then((resp) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(resp);
+            }, (err) => next(err))
+            .catch((error) => next(error));
     });
 
 
-// following routes are for perticular leaderId  
+// following routes are for perticular promoId 
 leaderRouter.route('/:leaderId')
-    .all((req, res, next) => {
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/plain')
-        next();
-    })
     .get((req, res, next) => {                        //get route
-        res.end("Will send details of the leaders: " + req.params.leaderId + " to you")
+        Leaders.findById(req.params.leaderId)
+            .then((leader) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(leader);
+            }, (err) => next(err))
+            .catch((error) => next(error));
     })
+
     .post((req, res, next) => {                       // post route 
         res.statusCode = 403;
         res.end("POST operation not supported on /leaders/" + req.params.leaderId)
     })
+
     .put((req, res, next) => {                        // put route 
-        res.write("Updating the leaders: " + req.params.leaderId + "\n")
-        res.end("will update the leaders: " + req.body.name + " with details: " + req.body.description)
+        Leaders.findByIdAndUpdate(req.params.leaderId, {
+            $set: req.body
+        }, { new: true })
+            .then((leader) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(leader);
+            }, (err) => next(err))
+            .catch((error) => next(error));
     })
     .delete((req, res, next) => {                     // delete route 
-        res.end("Deleting the leaders: " + req.params.leaderId);
+        Leaders.findByIdAndRemove(req.params.leaderId)
+            .then((resp) => {
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'application/json');
+                res.json(resp);
+            }, (err) => next(err))
+            .catch((error) => next(error));
     })
-
 
 
 module.exports = leaderRouter;
