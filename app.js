@@ -6,6 +6,8 @@ var logger = require('morgan');
 const mongoose = require("mongoose");
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
+var passport = require("passport");
+var authenticate = require('./authenticate');
 
 
 var indexRouter = require('./routes/index');
@@ -40,29 +42,25 @@ app.use(session({
   store: new FileStore()
 }));
 
+// passport configuration 
+app.use(passport.initialize());
+app.use(passport.session());
+
 // Route to be serverd before authentication 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
-
 // Authentication 
 const auth = (req, res, next) => {
-  console.log(req.session);
+  console.log(req.user);
 
-  if (!req.session.user) {
+  if (!req.user) {
     var err = new Error('You are not authenticated!');
     err.status = 403;
-    return next(err);
+    next(err);
   }
   else {
-    if (req.session.user === 'authenticated') {
-      next();
-    }
-    else {
-      var err = new Error('You are not authenticated!');
-      err.status = 403;
-      return next(err);
-    }
+    next();
   }
 }
 
