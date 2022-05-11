@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const Leaders = require("../models/leaders")
+const authenticate = require("../authenticate");
 
 const leaderRouter = express.Router();
 leaderRouter.use(bodyParser.json());
@@ -20,7 +21,7 @@ leaderRouter.route('/')
             .catch((error) => next(error));
     })
 
-    .post((req, res, next) => {         // post route 
+    .post(authenticate.verifyUser, (req, res, next) => {         // post route 
         Leaders.create(req.body)
             .then((leader) => {
                 console.log("leader created", leader);
@@ -31,12 +32,12 @@ leaderRouter.route('/')
             .catch((error) => next(error));
     })
 
-    .put((req, res, next) => {          // put route
+    .put(authenticate.verifyUser, (req, res, next) => {          // put route
         res.statusCode = 403;
         res.end("Put operation not supported on /promotions endpoint");
     })
 
-    .delete((req, res, next) => {       // delete route 
+    .delete(authenticate.verifyUser, (req, res, next) => {       // delete route 
         Leaders.remove({})
             .then((resp) => {
                 res.statusCode = 200;
@@ -59,12 +60,12 @@ leaderRouter.route('/:leaderId')
             .catch((error) => next(error));
     })
 
-    .post((req, res, next) => {                       // post route 
+    .post(authenticate.verifyUser, (req, res, next) => {                       // post route 
         res.statusCode = 403;
         res.end("POST operation not supported on /leaders/" + req.params.leaderId)
     })
 
-    .put((req, res, next) => {                        // put route 
+    .put(authenticate.verifyUser, (req, res, next) => {                        // put route 
         Leaders.findByIdAndUpdate(req.params.leaderId, {
             $set: req.body
         }, { new: true })
@@ -75,7 +76,7 @@ leaderRouter.route('/:leaderId')
             }, (err) => next(err))
             .catch((error) => next(error));
     })
-    .delete((req, res, next) => {                     // delete route 
+    .delete(authenticate.verifyUser, (req, res, next) => {                     // delete route 
         Leaders.findByIdAndRemove(req.params.leaderId)
             .then((resp) => {
                 res.statusCode = 200;

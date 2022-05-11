@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const Dishes = require("../models/dishes");
+const authenticate = require("../authenticate");
 
 const dishRouter = express.Router();
 dishRouter.use(bodyParser.json());
@@ -20,7 +21,7 @@ dishRouter.route('/')
             .catch((error) => next(error));
     })
 
-    .post((req, res, next) => {         // post route 
+    .post(authenticate.verifyUser, (req, res, next) => {         // post route 
         Dishes.create(req.body)
             .then((dish) => {
                 console.log("dish created", dish);
@@ -31,12 +32,12 @@ dishRouter.route('/')
             .catch((error) => next(error));
     })
 
-    .put((req, res, next) => {          // put route
+    .put(authenticate.verifyUser, (req, res, next) => {          // put route
         res.statusCode = 403;
         res.end("Put operation not supported on /dishes endpoint");
     })
 
-    .delete((req, res, next) => {       // delete route 
+    .delete(authenticate.verifyUser, (req, res, next) => {       // delete route 
         Dishes.remove({})
             .then((resp) => {
                 res.statusCode = 200;
@@ -59,12 +60,12 @@ dishRouter.route('/:dishId')
             .catch((error) => next(error));
     })
 
-    .post((req, res, next) => {                       // post route 
+    .post(authenticate.verifyUser, (req, res, next) => {                       // post route 
         res.statusCode = 403;
         res.end("POST operation not supported on /dishes/" + req.params.dishId)
     })
 
-    .put((req, res, next) => {                        // put route 
+    .put(authenticate.verifyUser, (req, res, next) => {                        // put route 
         Dishes.findByIdAndUpdate(req.params.dishId, {
             $set: req.body
         }, { new: true })
@@ -76,7 +77,7 @@ dishRouter.route('/:dishId')
             .catch((error) => next(error));
     })
 
-    .delete((req, res, next) => {                     // delete route 
+    .delete(authenticate.verifyUser, (req, res, next) => {                     // delete route 
         Dishes.findByIdAndRemove(req.params.dishId)
             .then((resp) => {
                 res.statusCode = 200;
@@ -105,7 +106,7 @@ dishRouter.route('/:dishId/comments')
             .catch((error) => next(error));
     })
 
-    .post((req, res, next) => {                          // post route
+    .post(authenticate.verifyUser, (req, res, next) => {                          // post route
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null) {
@@ -125,12 +126,12 @@ dishRouter.route('/:dishId/comments')
             .catch((error) => next(error));
     })
 
-    .put((req, res, next) => {                          // put route
+    .put(authenticate.verifyUser, (req, res, next) => {                          // put route
         res.statusCode = 403;
         res.end("Put operation not supported on /dishes/ " + req.params.dishId + " /comments");
     })
 
-    .delete((req, res, next) => {                       // delete route 
+    .delete(authenticate.verifyUser, (req, res, next) => {                       // delete route 
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null) {
@@ -175,12 +176,12 @@ dishRouter.route('/:dishId/comments/:commentId')
             .catch((error) => next(error));
     })
 
-    .post((req, res, next) => {                       // post route 
+    .post(authenticate.verifyUser, (req, res, next) => {                       // post route 
         res.statusCode = 403;
         res.end("POST operation not supported on /dishes/" + req.params.dishId + "/comments/" + req.params.commentId)
     })
 
-    .put((req, res, next) => {                        // put route 
+    .put(authenticate.verifyUser, (req, res, next) => {                        // put route 
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {
@@ -210,7 +211,7 @@ dishRouter.route('/:dishId/comments/:commentId')
             .catch((error) => next(error));
     })
 
-    .delete((req, res, next) => {                     // delete route 
+    .delete(authenticate.verifyUser, (req, res, next) => {                     // delete route 
         Dishes.findById(req.params.dishId)
             .then((dish) => {
                 if (dish != null && dish.comments.id(req.params.commentId) != null) {

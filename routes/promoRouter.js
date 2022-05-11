@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
 const Promotion = require("../models/promotions")
+const authenticate = require("../authenticate");
 
 const promoRouter = express.Router();
 promoRouter.use(bodyParser.json());
@@ -20,7 +21,7 @@ promoRouter.route('/')
             .catch((error) => next(error));
     })
 
-    .post((req, res, next) => {         // post route 
+    .post(authenticate.verifyUser, (req, res, next) => {         // post route 
         Promotion.create(req.body)
             .then((promotion) => {
                 console.log("promotion created", promotion);
@@ -31,12 +32,12 @@ promoRouter.route('/')
             .catch((error) => next(error));
     })
 
-    .put((req, res, next) => {          // put route
+    .put(authenticate.verifyUser, (req, res, next) => {          // put route
         res.statusCode = 403;
         res.end("Put operation not supported on /promotions endpoint");
     })
 
-    .delete((req, res, next) => {       // delete route 
+    .delete(authenticate.verifyUser, (req, res, next) => {       // delete route 
         Promotion.remove({})
             .then((resp) => {
                 res.statusCode = 200;
@@ -59,12 +60,12 @@ promoRouter.route('/:promoId')
             .catch((error) => next(error));
     })
 
-    .post((req, res, next) => {                       // post route 
+    .post(authenticate.verifyUser, (req, res, next) => {                       // post route 
         res.statusCode = 403;
         res.end("POST operation not supported on /promotions/" + req.params.promoId)
     })
 
-    .put((req, res, next) => {                        // put route 
+    .put(authenticate.verifyUser, (req, res, next) => {                        // put route 
         Promotion.findByIdAndUpdate(req.params.promoId, {
             $set: req.body
         }, { new: true })
@@ -75,7 +76,7 @@ promoRouter.route('/:promoId')
             }, (err) => next(err))
             .catch((error) => next(error));
     })
-    .delete((req, res, next) => {                     // delete route 
+    .delete(authenticate.verifyUser, (req, res, next) => {                     // delete route 
         Promotion.findByIdAndRemove(req.params.promoId)
             .then((resp) => {
                 res.statusCode = 200;
