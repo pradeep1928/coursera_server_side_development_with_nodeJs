@@ -21,7 +21,7 @@ leaderRouter.route('/')
             .catch((error) => next(error));
     })
 
-    .post(authenticate.verifyUser, (req, res, next) => {         // post route 
+    .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {         // post route 
         Leaders.create(req.body)
             .then((leader) => {
                 console.log("leader created", leader);
@@ -32,7 +32,7 @@ leaderRouter.route('/')
             .catch((error) => next(error));
     })
 
-    .put(authenticate.verifyUser, (req, res, next) => {          // put route
+    .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {          // put route
         res.statusCode = 403;
         res.end("Put operation not supported on /promotions endpoint");
     })
@@ -60,12 +60,12 @@ leaderRouter.route('/:leaderId')
             .catch((error) => next(error));
     })
 
-    .post(authenticate.verifyUser, (req, res, next) => {                       // post route 
+    .post(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {                       // post route 
         res.statusCode = 403;
         res.end("POST operation not supported on /leaders/" + req.params.leaderId)
     })
 
-    .put(authenticate.verifyUser, (req, res, next) => {                        // put route 
+    .put(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {                        // put route 
         Leaders.findByIdAndUpdate(req.params.leaderId, {
             $set: req.body
         }, { new: true })
@@ -76,7 +76,7 @@ leaderRouter.route('/:leaderId')
             }, (err) => next(err))
             .catch((error) => next(error));
     })
-    .delete(authenticate.verifyUser, (req, res, next) => {                     // delete route 
+    .delete(authenticate.verifyUser, authenticate.verifyAdmin, (req, res, next) => {                     // delete route 
         Leaders.findByIdAndRemove(req.params.leaderId)
             .then((resp) => {
                 res.statusCode = 200;
