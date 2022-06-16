@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+var dotenv = require("dotenv");
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -18,6 +19,7 @@ var leaderRouter = require('./routes/leaderRouter');
 var uploadRouter = require('./routes/uploadRouter');
 var favouriteRouter = require('./routes/favoriteRouter')
 
+dotenv.config();
 const url = config.mongoUrl;
 const connect = mongoose.connect(url);
 connect.then((db) => {
